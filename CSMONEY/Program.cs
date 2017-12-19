@@ -50,6 +50,7 @@ namespace CSMONEY
         public static int sleepITSF = 0;
         public static int sleepIDeals = 0;
         public static bool autoConfirm = false;
+        public static int threadCount = 7;
         public struct Dat
         {
             public int Id { get; set; }

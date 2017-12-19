@@ -146,26 +146,6 @@ namespace CSMONEY
                 }
             }
             catch (Exception ex) { Program.Mess.Enqueue("" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|" + ex.Message); }
-            string ll = File.ReadAllText("dataLootFarm.txt");
-            if (ll != "")
-            {
-                Program.DataLoot = JsonConvert.DeserializeObject<List<Program.Dat>>(ll);
-            }
-            string lk = File.ReadAllText("dataCsTrade.txt");
-            if (lk != "")
-            {
-                Program.DataCsTrade = JsonConvert.DeserializeObject<List<Program.Dat>>(lk);
-            }
-            string lq = File.ReadAllText("dataCsTSF.txt");
-            if (lq != "")
-            {
-                Program.DataTSF = JsonConvert.DeserializeObject<List<Program.Dat>>(lq);
-            }
-            string lw = File.ReadAllText("dataCsDeals.txt");
-            if (lq != "")
-            {
-                Program.DataDeals = JsonConvert.DeserializeObject<List<Program.Dat>>(lw);
-            }
             RefreshGrid();
 
         }
@@ -353,8 +333,14 @@ namespace CSMONEY
             else { Program.BrowesrQuery = false; }
         }
 
-
-
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                Program.threadCount = Convert.ToInt32(textBox5.Text);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
     }
 
 }

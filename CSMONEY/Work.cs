@@ -24,7 +24,7 @@ namespace CSMONEY
         int ID = 0;
 
         List<string> me = new List<string>();
-        List<string> them = new List<string>();
+        List<ForItemsUSer> them = new List<ForItemsUSer>();
         DatUser ItemsUser;
         Dat ItemsBot;
         string apiKey = Properties.Settings.Default.ApiKey;
@@ -51,7 +51,14 @@ namespace CSMONEY
             public string id { get; set; }
 
         }
-        
+
+        #endregion
+        #region ForItems
+        public struct ForItemsUSer
+        {
+            public string id { get; set; }
+            public int count { get; set; }
+        }
         #endregion
         #region UserInventoryStruc
         public struct DatUser
@@ -157,7 +164,7 @@ namespace CSMONEY
                     handler.CookieContainer.Add(new System.Net.Cookie(item.Name, item.Value) { Domain = item.Domain });
                 }
                 //Запуск запросов на отслеживания инвентаря ботов
-                for (int i = 0; i < 1; i++)
+                for (int i = 0; i < Program.threadCount; i++)
                 {
                     new System.Threading.Thread(delegate ()
                     {
@@ -179,6 +186,23 @@ namespace CSMONEY
                         catch (Exception ex) { }
                     }).Start();
                 }
+
+                //////////////////////////////////////////
+
+                    new System.Threading.Thread(delegate () {
+                        while (true)
+                        {
+                            try
+                            {
+                                Thread.Sleep(2000);
+                                driver.Navigate().Refresh();
+                                Thread.Sleep(300000);
+                            }
+                            catch (Exception ex) { }
+
+                        }
+                    }).Start();
+                
             }
             catch (Exception ex) { Program.Mess.Enqueue(ex.Message); }
 
@@ -207,8 +231,8 @@ namespace CSMONEY
                         string responseString = responseContent.ReadAsStringAsync().Result;
                         var ITEMS = JsonConvert.DeserializeObject<Dat>(responseString);
                         ItemsBot = ITEMS;
-                        ClickItem(ITEMS);
-                     //   Program.MessCsTrade.Enqueue("БОТ[" + id + "] " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|" + "Завершил загрузку предметов:" + ITEMS.inventory.Count);
+                  //      ClickItem(ITEMS);
+                        Program.Mess.Enqueue("" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|" + "Завершил загрузку предметов:" + ITEMS.items.Count);
                     }
 
                     Thread.Sleep(1000);
@@ -219,14 +243,19 @@ namespace CSMONEY
         }
         private void GetInvUser(HttpClientHandler handler)
         {
-            HttpClientHandler handler1 = handler;
-            HttpClient client = null;
 
+            HttpClient client = null;
+            HttpClientHandler handler2 = new HttpClientHandler();
+            var _cookies = driver.Manage().Cookies.AllCookies;
+            foreach (var item in _cookies)
+            {
+                handler2.CookieContainer.Add(new System.Net.Cookie(item.Name, item.Value) { Domain = item.Domain });
+            }
             while (true)
             {
                 try
                 {
-                    client = new HttpClient(handler1);
+                    client = new HttpClient(handler2);
                     client.Timeout = TimeSpan.FromSeconds(30);
                     client.DefaultRequestHeaders.Add("User-Agent",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
@@ -240,7 +269,7 @@ namespace CSMONEY
                         var responseContent = response.Content;
                         string responseString = responseContent.ReadAsStringAsync().Result;
                         ItemsUser = JsonConvert.DeserializeObject<DatUser>(responseString);
-                        //   Program.MessCsTrade.Enqueue("БОТ[" + id + "] " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|" + "Завершил загрузку предметов:" + ITEMS.inventory.Count);
+                           Program.Mess.Enqueue("" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|" + "Завершил загрузку предметов:" + ItemsUser.items.Count);
                     }
 
                     Thread.Sleep(5000);
@@ -282,7 +311,7 @@ namespace CSMONEY
                 catch (Exception ex) { }
 
         }
-        private void SendOffer(string botId, string itemsId)
+        private void SendOffer(string ContentPost)
         {
             HttpClientHandler handler = new HttpClientHandler();
             var _cookies = driver.Manage().Cookies.AllCookies;
@@ -300,7 +329,7 @@ namespace CSMONEY
                 client.DefaultRequestHeaders.Add("Accept", "application/json, text/plain, */*");
                 client.DefaultRequestHeaders.Add("accept-language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
                 client.DefaultRequestHeaders.Add("x-requested-with", "XMLHttpRequest");
-                StringContent content = new StringContent("{\"itemsFromMe\":[\"" + itemsId + "\"],\"itemsFromThem\":[],\"bot\":" + botId + ",\"isSocketConnected\":true,\"resetSession\":true,\"overstockBots\":[]}", Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(ContentPost, Encoding.UTF8, "application/json");
                 
                 var response = client.PostAsync("https://skinsjar.com/api/items/trade?v=2", content).Result;
 
@@ -309,7 +338,6 @@ namespace CSMONEY
                     var responseContent = response.Content;
                     string responseString = responseContent.ReadAsStringAsync().Result;
                     var ITEMS = JsonConvert.DeserializeObject<dynamic>(responseString);
-                    GetItemsAfterAutoSelect(ITEMS);
                 }
             }
             catch (Exception ex) { }
@@ -321,30 +349,54 @@ namespace CSMONEY
             string themStr = "";
             foreach (var item in me)
             {
-                var ss=ItemsBot.items.Find(N => (N.id == item)).items[0].id;
-                meStr += "\"" + ss + "\",";
+                try
+                {
+                    var ss = ItemsBot.items.Find(N => (N.id == item)).items[0].id;
+                    meStr += "\\\"" + ss + "\\\",";
+                }
+                catch (Exception ex) { }
             }
             var a = meStr;
             meStr = meStr.Remove(meStr.Length - 1, 1);
             foreach (var item in them)
             {
-                var ss = ItemsUser.items.Find(N => (N.id == item)).items[0].id;
-                themStr += "\"" + ss + "\",";
+                try
+                {
+                    for (int i = 0; i < item.count; i++)
+                    {
+                        var ss = ItemsUser.items.Find(N => (N.id == item.id)).items[i].id;
+                        themStr += "\\\"" + ss + "\\\",";
+                    }
+                   
+                }catch(Exception ex) {
+                    string ss = "";
+                }
             }
             themStr = themStr.Remove(themStr.Length - 1, 1);
-
-            return "{\"itemsFromThem\":["+ themStr + "],\"bot\":"+ botId + ",\"itemsFromMe\":["+ meStr + "],\"isSocketConnected\":true}";
+            
+            return "{\\\"itemsFromThem\\\":["+ themStr + "],\\\"bot\\\":"+ botId + ",\\\"itemsFromMe\\\":["+ meStr + "],\\\"isSocketConnected\\\":true}";
 
         }
         private void GetItemsAfterAutoSelect(dynamic itm)
         {
             foreach (var item in itm.me)
             {
-                me.Add(item.Name);
+
+                    for (int i = 0; i < (int)item.Value; i++)
+                    {
+                        me.Add(item.Name);
+                    }
+
             }
             foreach (var item in itm.them)
             {
-                them.Add(item.Name);
+
+                    ForItemsUSer FIU = new ForItemsUSer {
+                        id = item.Name,
+                        count = (int)item.Value
+                    };
+                    them.Add(FIU);
+                
             }
         }
         private bool ClickItem(Dat json)
@@ -363,27 +415,29 @@ namespace CSMONEY
                             Program.Mess.Enqueue("БОТ[" + ID + "] " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "| Нашел предмет :" + item.name + "|Цена_Сайта:" + item.price + "|Цена_Наша:" + name.Price);
                             if (item.price <= name.Price)
                             {
-                            
+                                me.Clear();
+                                them.Clear();
                                 Program.Mess.Enqueue("БОТ[" + ID + "] " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "| Оправил Запрос |" + "|IDItems:" + item.items[0].id.ToString() + "|wallet:" + item.price.ToString());
                                 AutoSelect(item.bot.ToString(), item.items[0].id.ToString());
+                                Program.Mess.Enqueue(  DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "Сделал Автоподбор!:" );
                                 string ContentUs = GetContentToOffer(item.bot.ToString());
-                                //    IJavaScriptExecutor js = driver as IJavaScriptExecutor;
-                                //    string ss1 = "var xhr = new XMLHttpRequest();" +
-                                //        "var body = \"{\\\"steamid\\\":\\\"" + b.ToString() + "\\\",\\\"peopleItems\\\":[],\\\"botItems\\\":[\\\"" + id.ToString() + "\\\"],\\\"onWallet\\\":-" + p.ToString().Replace(",", ".") + ",\\\"gid\\\":\\\""  + "\\\"}\";" +
-                                //        " xhr.open(\"POST\", 'https://cs.money/send_offer', true); " +
-                                //        "xhr.setRequestHeader('Content-Type', 'application/json');" +
-                                //        " xhr.setRequestHeader('accept', '*/*');" +
-                                //        " xhr.send(body); ";
-                                //    string title = (string)js.ExecuteScript(ss1);
+                                // SendOffer(ContentUs);
+                                IJavaScriptExecutor js = driver as IJavaScriptExecutor;
+                                //string querySelect = "var xhr = new XMLHttpRequest(); var body = \"" + "{\\\"itemsFromMe\\\":[\\\"" + item.items[0].id.ToString() + "\\\"],\\\"itemsFromThem\\\":[],\\\"bot\\\":" + item.bot.ToString() + ",\\\"isSocketConnected\\\":true,\\\"resetSession\\\":true,\\\"overstockBots\\\":[]}" + "\"; xhr.open(\"POST\", 'https://skinsjar.com/api/autoSelect?v=2', true); xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8'); xhr.setRequestHeader('x-requested-with', 'XMLHttpRequest'); xhr.setRequestHeader('accept', 'application/json, text/plain, */*');xhr.setRequestHeader('Custom-Params', '');  xhr.send(body); ";
+                                //string titleSelect = (string)js.ExecuteScript(querySelect);
+                                //Thread.Sleep(2000);
+                                //string queryLocked = "var xhr = new XMLHttpRequest(); xhr.open(\"GET\", 'https://skinsjar.com/api/sockets/getLocked?full=true&v=2', true);  xhr.setRequestHeader('x-requested-with', 'XMLHttpRequest'); xhr.setRequestHeader('accept', 'application/json, text/plain, */*'); xhr.setRequestHeader('Custom-Params', ''); xhr.send(); ";
+                                //string titleLocked = (string)js.ExecuteScript(queryLocked);
+                                //Thread.Sleep(2000);
+                                //string queryBalance = "var xhr = new XMLHttpRequest(); xhr.open(\"GET\", 'https://skinsjar.com/api/accounts/balance?v=2', true); xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8'); xhr.setRequestHeader('x-requested-with', 'XMLHttpRequest'); xhr.setRequestHeader('accept', 'application/json, text/plain, */*');xhr.setRequestHeader('Custom-Params', '');  xhr.send(); ";
+                                //string titleBalance = (string)js.ExecuteScript(queryBalance);
+                                //Thread.Sleep(2000);
+                                string query = "var xhr = new XMLHttpRequest();var body = \"" + ContentUs + "\"; xhr.open(\"POST\", 'https://skinsjar.com/api/items/trade?v=2', true); xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8'); xhr.setRequestHeader('x-requested-with', 'XMLHttpRequest'); xhr.setRequestHeader('accept', 'application/json, text/plain, */*'); xhr.setRequestHeader('Custom-Params', 'eyJib3RzSW52ZW50b3J5VGltZVN0YW1wIjoxNTEzMzc2MTA2LCJjYWNoZUtleSI6ImRlYnVnOnE0bDFLZlRhSnlZckE1bktoWmMrNVE9PX5+fjp+fn5vZVNmcnFHeGVTSGxYd0xlU0ZGNVE3bklGbjZGL0FTMkdobG02U2ptK01FL3BhWnF0QURnTkFlRVl6ajNaWnEvY1pwNUc4ckJaNTB0ZnUvMjNRVktrVUpzUENuYm04STVjSndvaHllRnFDNW43TTNpbzA1L2RVUEN1VFd4S3pCdiIsImFjY291bnRCYWxhbmNlQW1vdW50IjowLCJhY2NvdW50QmFsYW5jZUxvY2tlZEFtb3VudCI6MCwiYWNjb3VudEJhbGFuY2VUb3RhbEFtb3VudCI6MCwiY3VycmVuY3lTeW1ib2wiOiJVU0QiLCJjdXJyZW5jeU11bHRpcGxpZXIiOjF9'); xhr.send(body); ";
+                                string title = (string)js.ExecuteScript(query);
+                                Program.Mess.Enqueue(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "Завершил все запросы!");
+                                Thread.Sleep(3000);
+                                return false;
 
-                                //Program.Mess.Enqueue("БОТ[" + ID + "] " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|Завершил Запрос");
-                                //if (Program.autoConfirm == true)
-                                //{
-                                //    TradingBot tradeBot = new TradingBot(cook, cookAll, apiKey);
-                                //}
-                                ////      TradingBot tradeBot = new TradingBot(cook, apiKey);
-                                //Thread.Sleep(5000);
-                                return true;//main-trade-button
                             }
                             else {
                                 SetListBadPrice(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff"), "cs.money", item.name.ToString() , name.Price.ToString(), item.price.ToString());

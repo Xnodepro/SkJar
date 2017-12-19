@@ -7,7 +7,7 @@
     <ProjectGuid>{34103987-1DF4-4CC0-8505-9F670616B9F1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>CSMONEY</RootNamespace>
-    <AssemblyName>CSMONEY</AssemblyName>
+    <AssemblyName>SkinJar</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
