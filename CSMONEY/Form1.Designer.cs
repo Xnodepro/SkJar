@@ -51,6 +51,11 @@
             this.button4 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBox5 = new System.Windows.Forms.TextBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.button19 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
@@ -71,8 +76,9 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button7 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -81,6 +87,7 @@
             this.contextMenuStrip3.SuspendLayout();
             this.contextMenuStrip4.SuspendLayout();
             this.contextMenuStrip5.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -255,7 +262,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1093, 11);
+            this.label1.Location = new System.Drawing.Point(924, 10);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 17);
@@ -293,6 +300,10 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.button7);
+            this.tabPage1.Controls.Add(this.checkBox3);
+            this.tabPage1.Controls.Add(this.button6);
+            this.tabPage1.Controls.Add(this.button5);
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.textBox5);
             this.tabPage1.Controls.Add(this.checkBox2);
@@ -321,11 +332,61 @@
             this.tabPage1.Text = "SkinJar";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.BackColor = System.Drawing.Color.Bisque;
+            this.checkBox3.Location = new System.Drawing.Point(176, 9);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(208, 21);
+            this.checkBox3.TabIndex = 22;
+            this.checkBox3.Text = "Автообновление страницы";
+            this.checkBox3.UseVisualStyleBackColor = false;
+            this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(7, 6);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(163, 29);
+            this.button6.TabIndex = 21;
+            this.button6.Text = "button6";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(1107, 4);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(163, 29);
+            this.button5.TabIndex = 20;
+            this.button5.Text = "Подгрузить прокси";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(750, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(143, 17);
+            this.label2.TabIndex = 19;
+            this.label2.Text = "Количество потоков";
+            // 
+            // textBox5
+            // 
+            this.textBox5.Location = new System.Drawing.Point(899, 7);
+            this.textBox5.Name = "textBox5";
+            this.textBox5.Size = new System.Drawing.Size(53, 22);
+            this.textBox5.TabIndex = 18;
+            this.textBox5.Text = "7";
+            this.textBox5.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
+            // 
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
             this.checkBox2.BackColor = System.Drawing.Color.MistyRose;
-            this.checkBox2.Location = new System.Drawing.Point(571, 10);
+            this.checkBox2.Location = new System.Drawing.Point(664, 40);
             this.checkBox2.Margin = new System.Windows.Forms.Padding(4);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(179, 21);
@@ -339,7 +400,7 @@
             // 
             this.button19.BackColor = System.Drawing.Color.LightSteelBlue;
             this.button19.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button19.Location = new System.Drawing.Point(1129, 5);
+            this.button19.Location = new System.Drawing.Point(960, 4);
             this.button19.Margin = new System.Windows.Forms.Padding(4);
             this.button19.Name = "button19";
             this.button19.Size = new System.Drawing.Size(141, 28);
@@ -487,32 +548,45 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // textBox5
+            // menuStrip1
             // 
-            this.textBox5.Location = new System.Drawing.Point(1068, 8);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(53, 22);
-            this.textBox5.TabIndex = 18;
-            this.textBox5.Text = "7";
-            this.textBox5.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.настройкиToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 503);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1304, 28);
+            this.menuStrip1.TabIndex = 12;
+            this.menuStrip1.Text = "menuStrip1";
             // 
-            // label2
+            // настройкиToolStripMenuItem
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(919, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(143, 17);
-            this.label2.TabIndex = 19;
-            this.label2.Text = "Количество потоков";
+            this.настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
+            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(96, 24);
+            this.настройкиToolStripMenuItem.Text = "Настройки";
+            this.настройкиToolStripMenuItem.Click += new System.EventHandler(this.настройкиToolStripMenuItem_Click);
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(590, 6);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(75, 23);
+            this.button7.TabIndex = 23;
+            this.button7.Text = "button7";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1304, 500);
+            this.ClientSize = new System.Drawing.Size(1304, 531);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.button2);
             this.DoubleBuffered = true;
+            this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -525,7 +599,10 @@
             this.contextMenuStrip3.ResumeLayout(false);
             this.contextMenuStrip4.ResumeLayout(false);
             this.contextMenuStrip5.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -575,6 +652,12 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem;
+        private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.Button button7;
     }
 }
 

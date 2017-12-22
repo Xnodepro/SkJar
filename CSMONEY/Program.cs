@@ -21,6 +21,8 @@ namespace CSMONEY
         }
         
         public static List<Dat> Data = new List<Dat>();
+        public static List<DataForMoney> DataMoney = new List<DataForMoney>();
+        public static Work.Dat DataJar= new Work.Dat();
         public static List<Dat> DataLoot = new List<Dat>();
         public static List<Dat> DataCsTrade = new List<Dat>();
         public static List<Dat> DataTSF = new List<Dat>();
@@ -32,6 +34,8 @@ namespace CSMONEY
         public static Queue<string> MessCsTrade = new Queue<string>();
         public static Queue<string> MessTSF = new Queue<string>();
         public static Queue<string> MessDeals = new Queue<string>();
+        public static Queue<string> ProxyList = new Queue<string>();
+        public static List<string> ProxyListFix = new List<string>();
         public static bool BrowesrQuery = false;
         public static bool pauseMoney = false;
         public static bool pauseLoot = false;
@@ -51,6 +55,7 @@ namespace CSMONEY
         public static int sleepIDeals = 0;
         public static bool autoConfirm = false;
         public static int threadCount = 7;
+        public static bool AutoRefreshPage = false;
         public struct Dat
         {
             public int Id { get; set; }
@@ -66,6 +71,13 @@ namespace CSMONEY
             public string OldPrice { get; set; }
             public string NewPrice { get; set; }
         }
+        //public struct DataForMoney
+        //{
+        //    public string Name { get; set; }
+        //    public double Price { get; set; }
+        //    public string Id { get; set; }
+        //    public string Bot { get; set; }
+        //}
         public static  void SetListBadPrice(string _Data, string _Site, string _Name, string _OldPrice, string _NewPrice)
         {
             Program.DataViewBadPrice item = new Program.DataViewBadPrice()

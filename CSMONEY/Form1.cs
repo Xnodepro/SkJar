@@ -341,6 +341,46 @@ namespace CSMONEY
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            // получаем выбранный файл
+            string filename = openFileDialog1.FileName;
+            // читаем файл в строку
+            string[] fileText = System.IO.File.ReadAllLines(filename);
+            foreach (var item in fileText)
+            {
+                Program.ProxyList.Enqueue(item);
+                Program.ProxyListFix.Add(item);
+            }
+            MessageBox.Show(fileText.Length.ToString());
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Money money = new Money();
+            money.INI();
+        }
+
+        private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingProp SP= new SettingProp();
+            SP.Show();
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox3.Checked) { Program.AutoRefreshPage = true; }
+            else { Program.AutoRefreshPage = false; }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            Parsing Par = new Parsing();
+            Par.Show();
+        }
     }
 
 }

@@ -186,10 +186,34 @@ namespace CSMONEY
                         catch (Exception ex) { }
                     }).Start();
                 }
+                //////////////////////////////////////////
+                new System.Threading.Thread(delegate () {
+                    try
+                    {
+                        while (true)
+                        {
+                            try
+                            {
+                                Thread.Sleep(1000);
+                                if (Program.ProxyList.Count < 30)
+                                {
+                                    foreach (var item in Program.ProxyListFix)
+                                    {
+                                        Program.ProxyList.Enqueue(item);
+                                    }
+                                    Program.Mess.Enqueue(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|Обновил список прокси.");
+                                }
 
+                            }
+                            catch (Exception ex) { }
+                        }
+
+                    }
+                    catch (Exception ex) { }
+                }).Start();
                 //////////////////////////////////////////
 
-                    new System.Threading.Thread(delegate () {
+                new System.Threading.Thread(delegate () {
                         while (true)
                         {
                             try
@@ -207,17 +231,66 @@ namespace CSMONEY
             catch (Exception ex) { Program.Mess.Enqueue(ex.Message); }
 
         }
+
+        public HttpClient Prox(HttpClient client1, HttpClientHandler handler, string paroxyu)
+        {
+
+            HttpClient client = client1;
+            try
+            {
+                string
+                httpUserName = "webminidead",
+                httpPassword = "159357Qq";
+                string proxyUri = paroxyu;
+                NetworkCredential proxyCreds = new NetworkCredential(
+                    httpUserName,
+                    httpPassword
+                );
+                WebProxy proxy = new WebProxy(proxyUri, false)
+                {
+                    UseDefaultCredentials = false,
+                    Credentials = proxyCreds,
+                };
+                try
+                {
+                    handler.Proxy = null;
+                    handler.Proxy = proxy;
+                    handler.PreAuthenticate = true;
+                    handler.UseDefaultCredentials = false;
+                    handler.Credentials = new NetworkCredential(httpUserName, httpPassword);
+                    handler.AllowAutoRedirect = true;
+                }
+                catch (Exception ex) { }
+                client = new HttpClient(handler);
+            }
+            catch (Exception ex) { }
+            return client;
+        }
         private void Get(HttpClientHandler handler)
         {
             HttpClientHandler handler1 = handler;
-            HttpClient client = null;
 
             while (true)
             {
                 try
                 {
-                    client = new HttpClient(handler1);
+                    HttpClientHandler handler2 = new HttpClientHandler();
+                    var _cookies = driver.Manage().Cookies.AllCookies;
+                    foreach (var item in _cookies)
+                    {
+                        handler2.CookieContainer.Add(new System.Net.Cookie(item.Name, item.Value) { Domain = item.Domain });
+                    }
+
+                    HttpClient client = null;
+                    client = new HttpClient(handler2);
                     client.Timeout = TimeSpan.FromSeconds(30);
+                    //  string newProxy = Program.ProxyList.Dequeue();
+                    //  HttpClient client = null;
+                    ////  HttpClientHandler handler2 = new HttpClientHandler();
+                    //  handler2.CookieContainer = handler1.CookieContainer;
+                    //  handler2.Proxy = null;
+                    //  client = Prox(client, handler2, newProxy);// new HttpClient(handler1);
+                    //  client.Timeout = TimeSpan.FromSeconds(30);
                     client.DefaultRequestHeaders.Add("User-Agent",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
                     client.DefaultRequestHeaders.Add("Accept", "application/json, text/plain, */*");
@@ -231,13 +304,14 @@ namespace CSMONEY
                         string responseString = responseContent.ReadAsStringAsync().Result;
                         var ITEMS = JsonConvert.DeserializeObject<Dat>(responseString);
                         ItemsBot = ITEMS;
+                        Program.DataJar = ITEMS;
                   //      ClickItem(ITEMS);
                         Program.Mess.Enqueue("" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|" + "Завершил загрузку предметов:" + ITEMS.items.Count);
                     }
 
                     Thread.Sleep(1000);
                 }
-                catch (Exception ex) { }
+                catch (Exception ex) { Program.Mess.Enqueue("" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "|"  + ex.Message); }
             }
             // return new Data();
         }
